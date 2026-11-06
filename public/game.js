@@ -15,8 +15,15 @@
   let solo = null;
   let lastFrame = performance.now();
 
-  const W = 900, H = 560, CX = W / 2, CY = H / 2, HALF = 205;
+  const W = 900, H = 560, CX = W / 2, CY = H / 2, ARENA_RADIUS = 220, HALF = ARENA_RADIUS, PLAYER_LIMIT = ARENA_RADIUS - 27;
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+  function clampToArena(x, y) {
+    const dx = x - CX, dy = y - CY;
+    const distance = Math.hypot(dx, dy);
+    if (distance <= PLAYER_LIMIT || distance === 0) return { x, y };
+    const scale = PLAYER_LIMIT / distance;
+    return { x: CX + dx * scale, y: CY + dy * scale };
+  }
 
   function showOverlay(title, message) {
     overlay.innerHTML = `<div class="overlay-card"><h2>${title}</h2><p>${message}</p></div>`;
@@ -40,11 +47,9 @@
     keys.clear(); touchKeys.clear();
   }
   function randomSpawn() {
-    const side = Math.floor(Math.random() * 4), m = 58;
-    if (side === 0) return { x: m + Math.random() * 120, y: m + Math.random() * (H - 2*m) };
-    if (side === 1) return { x: W - m - Math.random() * 120, y: m + Math.random() * (H - 2*m) };
-    if (side === 2) return { x: m + Math.random() * (W - 2*m), y: m + Math.random() * 75 };
-    return { x: m + Math.random() * (W - 2*m), y: H - m - Math.random() * 75 };
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 155 + Math.random() * 35;
+    return { x: CX + Math.cos(angle) * radius, y: CY + Math.sin(angle) * radius };
   }
   function beginSoloRound() {
     const pos = randomSpawn();
@@ -142,9 +147,15 @@
       for(let k=0;k<5;k++){const a=k*Math.PI*2/5;ctx.beginPath();ctx.arc(x+Math.cos(a)*4,y+Math.sin(a)*4,3,0,Math.PI*2);ctx.fill();}
       ctx.fillStyle='#e4b948';ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fill();
     }
-    // Arena track
-    ctx.strokeStyle='#e8e6b766'; ctx.lineWidth=2; ctx.setLineDash([8,10]);
-    ctx.beginPath();ctx.ellipse(CX,CY,245,185,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+    // Dairesel oyun alanı: oyuncular bu çemberin dışına çıkamaz.
+    ctx.save();
+    ctx.beginPath(); ctx.arc(CX,CY,ARENA_RADIUS,0,Math.PI*2); ctx.clip();
+    ctx.fillStyle='#b8df7a22'; ctx.fillRect(CX-ARENA_RADIUS,CY-ARENA_RADIUS,ARENA_RADIUS*2,ARENA_RADIUS*2);
+    ctx.restore();
+    ctx.strokeStyle='#efffc9'; ctx.lineWidth=5;
+    ctx.beginPath();ctx.arc(CX,CY,ARENA_RADIUS,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle='#315f2d'; ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(CX,CY,ARENA_RADIUS-4,0,Math.PI*2);ctx.stroke();
     ctx.fillStyle='#ffffff17';ctx.beginPath();ctx.arc(CX,CY,28,0,Math.PI*2);ctx.fill();
   }
 
@@ -192,8 +203,9 @@
         solo.elapsed += dt;
         solo.angle += (1.45+Math.floor(solo.elapsed/10)*.38)*dt;
         const inp=readInput();
-        solo.x=clamp(solo.x+inp.x*205*dt,24,W-24);
-        solo.y=clamp(solo.y+inp.y*205*dt,24,H-24);
+        const bounded = clampToArena(solo.x + inp.x*205*dt, solo.y + inp.y*205*dt);
+        solo.x = bounded.x;
+        solo.y = bounded.y;
         const bx=Math.cos(solo.angle)*HALF, by=Math.sin(solo.angle)*HALF;
         if(pointSegmentDistance(solo.x,solo.y,CX-bx,CY-by,CX+bx,CY+by)<21) {
           solo.alive=false;solo.best=Math.max(solo.best,Math.floor(solo.elapsed));

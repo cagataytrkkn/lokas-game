@@ -25,3 +25,23 @@ BİLGİSAYARINDA ÇALIŞTIRMA
 
 ÖNEMLİ
 Bu paket hazır kaynak kodudur; internete yüklenmiş bir site veya satın alınmış lokas.com alan adı değildir. Alan adı, hosting hesabı ve yayınlama işlemleri site sahibinin hesabından yapılmalıdır.
+
+
+GÜNCELLEME: DAİRESEL ARENA VE TAM BOY SOPA
+------------------------------------------
+Bu sürümde:
+- Siyah sopa dairenin tam çapı boyunca uzanır.
+- Çevrim içi oyuncular sunucu tarafından dairenin içinde tutulur.
+- Tek oyunculu modda da oyuncu dairenin dışına çıkamaz.
+- Oyuncular dairenin içindeki dış halkaya yakın noktalarda doğar.
+
+MEVCUT RENDER SİTESİNİ GÜNCELLEME
+1) GitHub'daki LOKAS deposunu aç.
+2) Projede `package.json` dosyasının bulunduğu klasöre gir.
+3) `server.js` dosyasını bu paketteki yeni `server.js` ile değiştir.
+4) `public` klasörüne girip `game.js` dosyasını bu paketteki yeni `public/game.js` ile değiştir.
+5) Her dosyayı kaydederken GitHub'da **Commit changes** seç.
+6) Render otomatik dağıtım açıksa yeni sürümü kendisi yayınlar. Değilse Render panelinde **Manual Deploy → Deploy latest commit** seç.
+7) Siteyi açıp Ctrl+F5 ile yenile. Telefonda sayfayı kapatıp yeniden aç.
+
+Not: `server.js` ve `public/game.js` aynı uygulamanın dosyalarıdır; ikisini de güncelle. Sadece birini değiştirmek çevrim içi ve tek oyunculu modların farklı davranmasına neden olabilir.

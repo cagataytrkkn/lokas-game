@@ -10,9 +10,11 @@ const PORT = process.env.PORT || 3000;
 
 const WORLD = { width: 900, height: 560 };
 const CENTER = { x: WORLD.width / 2, y: WORLD.height / 2 };
-const BAR_HALF_LENGTH = 205;
+const ARENA_RADIUS = 220;
+const BAR_HALF_LENGTH = ARENA_RADIUS; // Sopa dairenin tam çapı boyunca uzanır.
 const BAR_WIDTH = 10;
 const PLAYER_RADIUS = 16;
+const PLAYER_CENTER_LIMIT = ARENA_RADIUS - 27; // Oyuncunun tamamı sınırın içinde kalır.
 const MOVE_SPEED = 205;
 const TICK_MS = 1000 / 30;
 const LOBBY_SECONDS = 10;
@@ -39,14 +41,13 @@ function safeName(value) {
 }
 
 function spawnPoint() {
-  const margin = 58;
-  const sides = [
-    { x: margin + Math.random() * 120, y: margin + Math.random() * (WORLD.height - margin * 2) },
-    { x: WORLD.width - margin - Math.random() * 120, y: margin + Math.random() * (WORLD.height - margin * 2) },
-    { x: margin + Math.random() * (WORLD.width - margin * 2), y: margin + Math.random() * 75 },
-    { x: margin + Math.random() * (WORLD.width - margin * 2), y: WORLD.height - margin - Math.random() * 75 }
-  ];
-  return sides[Math.floor(Math.random() * sides.length)];
+  // Oyuncuları dairesel arenanın içinde, dış çembere yakın başlat.
+  const angle = Math.random() * Math.PI * 2;
+  const radius = 155 + Math.random() * 35;
+  return {
+    x: CENTER.x + Math.cos(angle) * radius,
+    y: CENTER.y + Math.sin(angle) * radius
+  };
 }
 
 function resetPlayer(p) {
@@ -110,6 +111,7 @@ function publicState() {
     aliveCount: list.filter(p => p.alive).length,
     playerCount: list.length,
     world: WORLD,
+    arenaRadius: ARENA_RADIUS,
     barHalfLength: BAR_HALF_LENGTH
   };
 }
@@ -173,8 +175,15 @@ setInterval(() => {
       if (!p.alive) continue;
       p.x += p.input.x * MOVE_SPEED * dt;
       p.y += p.input.y * MOVE_SPEED * dt;
-      p.x = Math.max(PLAYER_RADIUS + 8, Math.min(WORLD.width - PLAYER_RADIUS - 8, p.x));
-      p.y = Math.max(PLAYER_RADIUS + 8, Math.min(WORLD.height - PLAYER_RADIUS - 8, p.y));
+      // Dikdörtgen kenarlara değil, dairesel arena sınırına göre konumlandır.
+      const fromCenterX = p.x - CENTER.x;
+      const fromCenterY = p.y - CENTER.y;
+      const distanceFromCenter = Math.hypot(fromCenterX, fromCenterY);
+      if (distanceFromCenter > PLAYER_CENTER_LIMIT) {
+        const scale = PLAYER_CENTER_LIMIT / distanceFromCenter;
+        p.x = CENTER.x + fromCenterX * scale;
+        p.y = CENTER.y + fromCenterY * scale;
+      }
       p.score = Math.floor(round.elapsed);
       if (pointSegmentDistance(p.x, p.y, x1, y1, x2, y2) < PLAYER_RADIUS + BAR_WIDTH / 2) {
         p.alive = false;
