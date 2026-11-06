@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#101812" />
+  <meta name="description" content="LOKAS — Dönen sopadan kaç! Arkadaşlarınla çevrim içi raunda katıl veya tek başına oyna." />
+  <title>LOKAS — Kaçış Arenası</title>
+  <style>
+    :root { color-scheme: dark; --lime:#b7f36b; --ink:#101812; --panel:#19251b; --muted:#a5b39f; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:#f6f7ee; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; background:radial-gradient(ellipse at 50% -20%,#344a2b 0%,#17251a 45%,#0c120e 100%); }
+    button,input { font:inherit; }
+    .wrap { width:min(1120px,94vw); margin:0 auto; padding:22px 0 30px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:30px; }
+    .brand { display:flex; align-items:center; gap:11px; font-weight:1000; letter-spacing:.14em; font-size:25px; }
+    .brand-mark { width:35px; height:35px; display:grid; place-items:center; background:var(--lime); border-radius:11px; color:#15200f; font-size:24px; transform:rotate(-9deg); }
+    .online-pill { display:flex; align-items:center; gap:8px; color:#c7d5c1; font-size:13px; background:#18241c; border:1px solid #334532; padding:8px 12px; border-radius:99px; }
+    .dot { width:8px;height:8px;border-radius:50%;background:#8ee36c;box-shadow:0 0 12px #8ee36c; }
+    .hero { text-align:center; margin:0 auto 25px; }
+    .eyebrow { color:var(--lime); font-size:12px; font-weight:900; letter-spacing:.2em; text-transform:uppercase; }
+    h1 { font-size:clamp(36px,7vw,64px); line-height:1; letter-spacing:-.055em; margin:12px 0; }
+    h1 span { color:var(--lime); }
+    .lead { color:#b7c3b1; max-width:590px; margin:0 auto; line-height:1.6; font-size:15px; }
+    .panel { background:linear-gradient(145deg,rgba(29,43,31,.97),rgba(17,28,20,.97)); border:1px solid #354635; border-radius:23px; box-shadow:0 24px 80px #0007; padding:22px; }
+    .mode-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; max-width:760px; margin:28px auto 0; }
+    .mode-card { text-align:left; padding:23px; border-radius:17px; border:1px solid #465b42; background:#202f22; min-height:185px; display:flex; flex-direction:column; }
+    .mode-icon { font-size:30px; margin-bottom:10px; }
+    .mode-card h2 { font-size:20px; margin:0 0 7px; }
+    .mode-card p { color:#b0beb0; font-size:13px; line-height:1.5; margin:0 0 18px; }
+    .btn { border:0; cursor:pointer; padding:12px 18px; border-radius:12px; background:var(--lime); color:#15200f; font-weight:950; transition:transform .15s,filter .15s; }
+    .btn:hover { transform:translateY(-2px); filter:brightness(1.07); }
+    .btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+    .btn.secondary { background:#2d402e; color:#eff8e8; border:1px solid #526a4d; }
+    .mode-card .btn { margin-top:auto; width:100%; }
+    .name-row { max-width:370px; margin:20px auto 0; display:flex; gap:8px; }
+    .name-row input { width:100%; min-width:0; border:1px solid #496044; background:#111b13; color:white; padding:12px 13px; border-radius:11px; outline:none; }
+    .name-row input:focus { border-color:var(--lime); }
+    .hidden { display:none !important; }
+    .game-panel { padding:14px; }
+    .game-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:3px 4px 13px; }
+    .game-title { font-weight:950; letter-spacing:.05em; }
+    .stats { display:flex; gap:8px; flex-wrap:wrap; }
+    .stat { background:#101a12; border:1px solid #344a34; color:#c9d5c1; padding:7px 11px; border-radius:99px; font-size:12px; }
+    .stat b { color:var(--lime); }
+    .canvas-shell { position:relative; overflow:hidden; border-radius:15px; border:1px solid #526b42; background:#78a94a; }
+    canvas { display:block; width:100%; height:auto; aspect-ratio:900/560; touch-action:none; }
+    .overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; padding:15px; }
+    .overlay-card { background:#101a12eF; border:1px solid #809b63; padding:18px 25px; border-radius:17px; text-align:center; box-shadow:0 12px 40px #0007; max-width:340px; }
+    .overlay-card h2 { margin:0 0 6px; font-size:25px; }
+    .overlay-card p { color:#c5d3be; margin:0; font-size:13px; line-height:1.5; }
+    .below { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:14px 4px 2px; }
+    .hint { color:#b4c1ad; font-size:12px; line-height:1.5; }
+    .controls { display:flex; gap:6px; align-items:center; }
+    .touch-pad { display:none; grid-template-columns:repeat(3,44px); grid-template-rows:repeat(2,40px); gap:4px; }
+    .touch-pad button { padding:0; border:1px solid #52694d; border-radius:9px; background:#263b28; color:white; font-weight:900; touch-action:none; }
+    .touch-pad .up { grid-column:2; }
+    .touch-pad .left { grid-column:1; grid-row:2; }
+    .touch-pad .down { grid-column:2; grid-row:2; }
+    .touch-pad .right { grid-column:3; grid-row:2; }
+    .bottom-note { margin:23px 0 0; color:#82917d; text-align:center; font-size:11px; }
+    @media(max-width:650px) { .wrap{padding-top:15px}.mode-grid{grid-template-columns:1fr}.mode-card{min-height:160px}.panel{padding:12px}.touch-pad{display:grid}.hint{max-width:48%}.brand{font-size:21px} }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="brand"><span class="brand-mark">↗</span> LOKAS</div>
+      <div class="online-pill"><span class="dot"></span><span id="headerStatus">KAÇIŞ ARENASI</span></div>
+    </header>
+
+    <section id="homeScreen">
+      <div class="hero">
+        <div class="eyebrow">BAHÇEDE HAYATTA KAL</div>
+        <h1>SOPA DÖNÜYOR.<br><span>KAÇ!</span></h1>
+        <p class="lead">Ortadaki siyah sopaya yakalanma. Her 10 saniyede hız artar. Arkadaşlarınla aynı raunda gir ya da tek başına rekorunu zorla.</p>
+      </div>
+      <div class="mode-grid">
+        <article class="mode-card">
+          <div class="mode-icon">🌐</div>
+          <h2>Çevrim içi raund</h2>
+          <p>Diğer oyuncularla aynı arenaya katıl. Herkes aynı anda oynar; raundlar otomatik başlar.</p>
+          <button class="btn" id="onlineBtn">ÇOK OYUNCULU OYNA</button>
+        </article>
+        <article class="mode-card">
+          <div class="mode-icon">🏃</div>
+          <h2>Tek oyunculu</h2>
+          <p>Kendi başına oyna. Ne kadar dayanabileceğini gör ve kişisel rekorunu geliştir.</p>
+          <button class="btn secondary" id="soloBtn">TEK BAŞIMA OYNA</button>
+        </article>
+      </div>
+      <div class="name-row"><input id="playerName" maxlength="14" placeholder="Oyuncu adın" value="Oyuncu" aria-label="Oyuncu adın" /></div>
+    </section>
+
+    <section id="gameScreen" class="panel game-panel hidden">
+      <div class="game-top">
+        <div class="game-title" id="modeTitle">LOKAS / ÇEVRİM İÇİ</div>
+        <div class="stats">
+          <div class="stat">RAUND <b id="roundStat">—</b></div>
+          <div class="stat">SÜRE <b id="timeStat">0</b></div>
+          <div class="stat">HAYATTA <b id="aliveStat">0</b></div>
+        </div>
+      </div>
+      <div class="canvas-shell">
+        <canvas id="arena" width="900" height="560" aria-label="LOKAS oyun alanı"></canvas>
+        <div class="overlay" id="overlay"><div class="overlay-card"><h2>Hazır mısın?</h2><p>Oyun yükleniyor…</p></div></div>
+      </div>
+      <div class="below">
+        <div class="hint" id="hintText">Hareket: WASD veya yön tuşları</div>
+        <div class="controls">
+          <div class="touch-pad" aria-label="Dokunmatik hareket tuşları">
+            <button class="up" data-dir="up">▲</button><button class="left" data-dir="left">◀</button><button class="down" data-dir="down">▼</button><button class="right" data-dir="right">▶</button>
+          </div>
+          <button class="btn secondary" id="backBtn">MENÜYE DÖN</button>
+        </div>
+      </div>
+    </section>
+    <p class="bottom-note">LOKAS © 2026 · Reflekslerine güven!</p>
+  </main>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
